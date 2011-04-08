@@ -11,10 +11,13 @@ links_url = "http://www.b3ta.com/links/popular/"
 homemade_url = "http://www.b3ta.com/links/popular/?i=1" # b3tan's own
 #url = homemade_url
 
-from twitter import Twitter, NoAuth, OAuth, read_token_file
-from twitter.cmdline import CONSUMER_KEY, CONSUMER_SECRET
-oauth = OAuth(*read_token_file(os.path.expanduser('~/.twitter_oauth')) + (CONSUMER_KEY, CONSUMER_SECRET))
-twitter = Twitter(domain='api.twitter.com',auth=oauth, api_version='1')
+#from twitter import Twitter, NoAuth, OAuth, read_token_file
+#from twitter.cmdline import CONSUMER_KEY, CONSUMER_SECRET
+import twitter
+import twitter.cmdline
+
+oauth = twitter.OAuth(*twitter.read_token_file(os.path.expanduser('~/.twitter_oauth')) + (twitter.cmdline.CONSUMER_KEY, twitter.cmdline.CONSUMER_SECRET))
+bird = twitter.Twitter(domain='api.twitter.com',auth=oauth, api_version='1')
 
 for url in [links_url,homemade_url]:
 
@@ -48,6 +51,6 @@ for url in [links_url,homemade_url]:
         print tweet
 
         try:
-            twitter.statuses.update(status=tweet)
+            bird.statuses.update(status=tweet)
         except twitter.api.TwitterHTTPError, E:
             pass
