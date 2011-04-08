@@ -2,7 +2,8 @@
 from BeautifulSoup import BeautifulSoup
 import urllib2
 import urlparse
-
+import os.path
+import bitly
 home = "http://twitter.com/lol_o_clock"
 
 links_url = "http://www.b3ta.com/links/popular/"
@@ -13,6 +14,7 @@ page = urllib2.urlopen(url)
 soup = BeautifulSoup(page)
 
 posts = soup.findAll('div',attrs={'class':['post1','post2']})
+
 post=posts[0]
 A = post.findAll('a')
 
@@ -25,7 +27,7 @@ if post.find(attrs={'class':'imadethis'}):
   link = sburl
 
 import bitly
-bcreds= open('bitly_creds').readlines()
+bcreds= open(os.path.expanduser('~/.bitly_creds')).readlines()
 blogin = bcreds[0].strip()
 bapikey = bcreds[1].strip()
 bapi = bitly.Api(login=blogin,apikey=bapikey)
@@ -42,6 +44,6 @@ from twitter import Twitter, NoAuth, OAuth, read_token_file
 from twitter.cmdline import CONSUMER_KEY, CONSUMER_SECRET
 import os.path
 
-oauth = OAuth(*read_token_file('twitter_oauth') + (CONSUMER_KEY, CONSUMER_SECRET))
+oauth = OAuth(*read_token_file(os.path.expanduser('~/.twitter_oauth')) + (CONSUMER_KEY, CONSUMER_SECRET))
 twitter = Twitter(domain='api.twitter.com',auth=oauth, api_version='1')
 twitter.statuses.update(status=tweet)
