@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from BeautifulSoup import BeautifulSoup
+import json
 import urllib2
 import urlparse
 import os.path
@@ -11,15 +12,13 @@ links_url = "http://www.b3ta.com/links/popular/"
 homemade_url = "http://www.b3ta.com/links/popular/?i=1" # b3tan's own
 #url = homemade_url
 
-#from twitter import Twitter, NoAuth, OAuth, read_token_file
-#from twitter.cmdline import CONSUMER_KEY, CONSUMER_SECRET
 import twitter
 import twitter.cmdline
 
 oauth = twitter.OAuth(*twitter.read_token_file(os.path.expanduser('~/.twitter_oauth')) + (twitter.cmdline.CONSUMER_KEY, twitter.cmdline.CONSUMER_SECRET))
 bird = twitter.Twitter(domain='api.twitter.com',auth=oauth, api_version='1')
 
-for url in [links_url,homemade_url]:
+for url in [homemade_url,links_url]:
 
     page = urllib2.urlopen(url)
     soup = BeautifulSoup(page)
@@ -37,7 +36,9 @@ for url in [links_url,homemade_url]:
 
         if post.find(attrs={'class':'imadethis'}):
             link = sburl
-
+            if url == links_url:
+                continue            
+             
         bcreds= open(os.path.expanduser('~/.bitly_creds')).readlines()
         blogin = bcreds[0].strip()
         bapikey = bcreds[1].strip()
@@ -52,5 +53,14 @@ for url in [links_url,homemade_url]:
 
         try:
             bird.statuses.update(status=tweet)
-        except twitter.api.TwitterHTTPError, E:
-            pass
+            break
+        except twitter.api.TwitterHTTPError as E:
+           # print E
+           reason = json.loads(E.e.fp.read())['error']
+           print reason
+           if "duplicate" in reason:
+                break
+           else:
+                E.e.fp.write(reason)
+                raise twitter.api.TwitterHTTPError, E
+     
