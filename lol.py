@@ -1,6 +1,5 @@
 #!/usr/bin/python
 from bs4 import BeautifulSoup
-import json
 import requests
 from six.moves.urllib_parse import urljoin
 import os.path
@@ -17,7 +16,6 @@ oauth = twitter.OAuth(*twitter.read_token_file(os.path.expanduser('~/.twitter_oa
 bird = twitter.Twitter(domain='api.twitter.com',auth=oauth, api_version='1.1')
 
 for url in [homemade_url,links_url]:
-
     response = requests.get(url)
     response.raise_for_status()
     page = response.content
@@ -38,13 +36,10 @@ for url in [homemade_url,links_url]:
                 continue            
              
         tweet = "%s %s" % (title,link)
-        if len(tweet) > 140:
-            continue
-
-            # broken
-
+        
+        # broken
+        if False and len(tweet) > 140:
             import bitly
-
             bcreds= open(os.path.expanduser('~/.bitly_creds')).readlines()
             blogin = bcreds[0].strip()
             bapikey = bcreds[1].strip()
@@ -58,12 +53,6 @@ for url in [homemade_url,links_url]:
             bird.statuses.update(status=tweet)
             break
         except twitter.api.TwitterHTTPError as E:
-           # print E
-           reason = json.loads(E.e.fp.read())['error']
-           print(reason)
-           if "duplicate" in reason:
-                break
-           else:
-                E.e.fp.write(reason)
-                raise twitter.api.TwitterHTTPError(E)
+            print(E)
+            continue
      
