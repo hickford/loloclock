@@ -30,11 +30,7 @@ for url in [homemade_url,links_url]:
         link = A[2]['href']
         title = A[2].string
 
-        if post.find(attrs={'class':'imadethis'}):
-            link = sburl
-            if url == links_url:
-                continue            
-             
+        link = link or sburl      
         tweet = "%s %s" % (title,link)
         
         # broken
