@@ -17,7 +17,7 @@ bird = twitter.Twitter(domain='api.twitter.com',auth=oauth, api_version='1.1')
 def tweet(message):
     bird.statuses.update(status=tweet)
 
-for url in [homemade_url,links_url]:
+for url in [homemade_url]:
     response = requests.get(url)
     response.raise_for_status()
     page = response.content
